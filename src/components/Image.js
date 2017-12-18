@@ -24,7 +24,7 @@ _Image.propTypes = {
 };
 
 function mapImageStateToProps({tmdbConfiguration}) {
-    return {baseUrl: tmdbConfiguration.images.base_url};
+    return {baseUrl: tmdbConfiguration.images.secure_base_url};
 }
 
 function mapBackdropStateToProps({

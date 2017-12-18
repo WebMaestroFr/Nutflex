@@ -12,7 +12,8 @@ export default class MediaList extends Component {
     render() {
         const {ready, results} = this.props;
         return ready
-            ? <Item.Group className='MediaList' divided={true} relaxed='very'>{
+            ? <Item.Group className='MediaList' divided={true} relaxed='very'>
+                    {
                         results.map(result => {
                             const key = `${result.media_type}-${result.id}`;
                             switch (result.media_type) {
@@ -26,7 +27,8 @@ export default class MediaList extends Component {
                                     return null;
                             }
                         })
-                    }</Item.Group>
+                    }
+                </Item.Group>
             : <Loader active={true}/>;
     }
 }
