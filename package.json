@@ -1,0 +1,35 @@
+{
+    "name": "nutflex",
+    "productName": "Nutflex",
+    "version": "0.1.0",
+    "main": "main.js",
+    "homepage": "./",
+    "private": true,
+    "dependencies": {
+        "prop-types": "^15.6.0",
+        "react": "^16.2.0",
+        "react-dom": "^16.2.0",
+        "react-redux": "^5.0.6",
+        "react-router-dom": "^4.2.2",
+        "react-scripts": "1.0.17",
+        "redux": "^3.7.2",
+        "redux-thunk": "^2.2.0",
+        "semantic-ui-css": "^2.2.12",
+        "semantic-ui-react": "^0.77.0"
+    },
+    "scripts": {
+        "start": "react-scripts start",
+        "build": "react-scripts build",
+        "test": "react-scripts test --env=jsdom",
+        "eject": "react-scripts eject",
+        "dist": "npm run build && npm run dist-osx && npm run dist-windows && npm run dist-linux",
+        "dist-osx": "electron-packager . --platform=darwin --arch=all --out=dist --icon=public/icons/icon.icns --overwrite",
+        "dist-windows": "electron-packager . --platform=win32 --arch=all --out=dist --icon=public/favicon.ico --overwrite",
+        "dist-linux": "electron-packager . --platform=linux --arch=all --out=dist --icon=public/icons/1024x1024.png --overwrite",
+        "dev": "BROWSER=none npm run start & ELECTRON_DEV_URL=http://localhost:3000 electron . "
+    },
+    "devDependencies": {
+        "electron": "^1.7.9",
+        "electron-packager": "^10.1.0"
+    }
+}

@@ -1,0 +1,58 @@
+body {
+    background-color: black !important;
+}
+
+h1.header {
+    font-size: 2rem !important;
+}
+
+h2.header {
+    font-size: 1.71428571rem !important;
+}
+
+h3.header,
+h3.item {
+    font-size: 1.28571429rem !important;
+    margin-bottom: 0;
+    margin-top: 0;
+}
+
+#root {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    min-height: 100%;
+    padding-bottom: 2rem;
+    padding-top: 1rem;
+}
+
+.App-main,
+.items,
+.items > .item {
+    min-height: 100px;
+    position: relative;
+}
+
+.inverted .description,
+.inverted .item {
+    color: rgba(255,255,255,.87) !important;
+}
+
+.inverted .header {
+    color: rgba(255,255,255,.85) !important;
+}
+
+.inverted .meta {
+    color: rgba(255,255,255,.6) !important;
+}
+
+.inverted .divided.items > .item {
+    border-top-color: rgba(255,255,255,.1) !important;
+}
+
+.extra > .divider {
+    margin: 1rem 0.5rem 1rem 0 !important;
+}
+
+.extra > .divider.section {
+    margin: 2rem 0.5rem 2rem 0 !important;
+}
