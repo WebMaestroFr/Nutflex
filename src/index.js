@@ -14,7 +14,7 @@ import 'semantic-ui-css/semantic.min.css';
 
 const store = createStore(reducers, applyMiddleware(thunk));
 
-localStorage.clear();
+// localStorage.clear();
 
 ReactDOM.render(
     <BrowserRouter>

@@ -107,7 +107,7 @@ class TvShowSeason extends Component {
                                     : null
                             }
                         </Item.Content>
-                    : <Loader active={true}/>
+                    : <Item.Content><Loader active={true}/></Item.Content>
             }
         </Item>;
     }
@@ -190,7 +190,7 @@ export class TvShowItem extends Component {
                                     : null
                             }
                         </Item.Content>
-                    : <Loader active={true}/>
+                    : <Item.Content><Loader active={true}/></Item.Content>
             }
         </Item>;
     }

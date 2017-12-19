@@ -26,9 +26,8 @@ h3.item {
 }
 
 .App-main,
-.items,
-.items > .item {
-    min-height: 100px;
+.item > .content {
+    min-height: 32px;
     position: relative;
 }
 
@@ -45,7 +44,7 @@ h3.item {
     color: rgba(255,255,255,.6) !important;
 }
 
-.inverted .divided.items > .item {
+.inverted .divided > .item {
     border-top-color: rgba(255,255,255,.1) !important;
 }
 
@@ -53,6 +52,6 @@ h3.item {
     margin: 1rem 0.5rem 1rem 0 !important;
 }
 
-.extra > .divider.section {
+.extra > .section {
     margin: 2rem 0.5rem 2rem 0 !important;
 }
