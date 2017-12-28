@@ -1,5 +1,7 @@
 body {
     background-color: black !important;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
 
 h1.header {
@@ -18,17 +20,15 @@ h3.item {
 }
 
 #root {
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
     min-height: 100%;
     padding-bottom: 2rem;
     padding-top: 1rem;
 }
 
-.App-main,
-.item > .content {
+.modal .content .description {
     min-height: 32px;
     position: relative;
+    width: 100% !important;
 }
 
 .inverted .description,

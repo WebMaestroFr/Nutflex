@@ -164,17 +164,63 @@ function mapProfileStateToProps({
     };
 }
 
+function mapStillStateToProps({
+    tmdbConfiguration
+}, {
+    size,
+    ...props
+}) {
+    let imageSize;
+    switch (size) {
+        case 'mini':
+        case 'tiny':
+            // 35px, 80px => w92
+            imageSize = tmdbConfiguration
+                .images
+                .still_sizes[0];
+            break;
+        case 'small':
+            // 150px => w185
+            imageSize = tmdbConfiguration
+                .images
+                .still_sizes[1];
+            break;
+        case 'medium':
+            // 300px => w300
+            imageSize = tmdbConfiguration
+                .images
+                .still_sizes[2];
+            break;
+        case 'large':
+        case 'big':
+        case 'huge':
+        case 'massive':
+        default:
+            // 450px, 600px, 800px, 960px => original
+            imageSize = tmdbConfiguration
+                .images
+                .still_sizes[3];
+    }
+    return {
+        imageSize,
+        size,
+        ...props
+    };
+}
+
 const connectImage = connect(mapImageStateToProps),
     connectBackdrop = connect(mapBackdropStateToProps),
     connectPoster = connect(mapPosterStateToProps),
     connectProfile = connect(mapProfileStateToProps),
+    connectStill = connect(mapStillStateToProps),
     ImageComponent = connectImage(_Image);
 
 export const Backdrop = connectBackdrop(ImageComponent),
     Poster = connectPoster(ImageComponent),
-    Profile = connectProfile(ImageComponent);
+    Profile = connectProfile(ImageComponent),
+    Still = connectStill(ImageComponent);
 
-Backdrop.propTypes = Poster.propTypes = Profile.propTypes = {
+Backdrop.propTypes = Poster.propTypes = Profile.propTypes = Still.propTypes = {
     imagePath: PropTypes.string.isRequired,
     size: PropTypes.oneOf([
         'mini',
@@ -188,7 +234,7 @@ Backdrop.propTypes = Poster.propTypes = Profile.propTypes = {
     ])
 };
 
-Backdrop.defaultProps = Poster.defaultProps = Profile.defaultProps = {
+Backdrop.defaultProps = Poster.defaultProps = Profile.defaultProps = Still.defaultProps = {
     size: 'medium'
 };
 

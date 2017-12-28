@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import {theMovieDB} from '../actions';
 
 import {Divider, Item, List, Loader} from 'semantic-ui-react';
+
 import {Poster} from './Image';
 
 function pad(n, l = 2) {
@@ -18,13 +19,11 @@ class TvShowSeasonEpisode extends Component {
         const {episode_number, name, season_number} = this.props,
             episodeNumber = pad(episode_number),
             seasonNumber = pad(season_number);
-        return <List.Item as='h3'>
-            {
+        return <List.Item as='h3'>{
                 season_number !== 0
                     ? `s${seasonNumber}e${episodeNumber} - ${name}`
                     : name
-            }
-        </List.Item>;
+            }</List.Item>;
     }
 }
 
@@ -107,7 +106,7 @@ class TvShowSeason extends Component {
                                     : null
                             }
                         </Item.Content>
-                    : <Item.Content><Loader active={true}/></Item.Content>
+                    : <Item.Content><Loader active={true} inline='centered'/></Item.Content>
             }
         </Item>;
     }
@@ -190,7 +189,7 @@ export class TvShowItem extends Component {
                                     : null
                             }
                         </Item.Content>
-                    : <Item.Content><Loader active={true}/></Item.Content>
+                    : <Item.Content><Loader active={true} inline='centered'/></Item.Content>
             }
         </Item>;
     }

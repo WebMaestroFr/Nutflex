@@ -1,27 +1,62 @@
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
 
-import {Item, Loader} from 'semantic-ui-react';
+import {theMovieDB} from '../actions';
+
+import {Item} from 'semantic-ui-react';
 
 import {Backdrop, Poster} from './Image';
 
 export class MovieItem extends Component {
-    render() {
-        const {backdrop_path, overview, poster_path, release_date, title} = this.props,
-            date = new Date(release_date);
-        return <Item>
-            {
-                poster_path
-                    ? <Poster as={Item.Image} imagePath={poster_path} rounded={true} size='medium'/>
+    constructor(props) {
+        super(props)
+        this.state = {
+            director: null
+        };
+    }
+    componentDidMount() {
+        const {id} = this.props;
+        this._fetch = theMovieDB.fetch(`movie/${id}/credits`);
+        this
+            ._fetch
+            .done(
+                data => data
+                    ? this.setState({
+                        director: data
+                            .crew
+                            .find(credit => credit.job === 'Director')
+                    })
                     : null
-            }
+            );
+    }
+    componentWillUnmount() {
+        this
+            ._fetch
+            .cancel();
+    }
+    render() {
+        const {backdrop_path, overview, poster_path, release_date, title} = this.props, {director} = this.state,
+            date = new Date(release_date),
+            fullYear = date.getFullYear(),
+            poster = poster_path
+                ? <Poster as={Item.Image} imagePath={poster_path} rounded={true} size='medium'/>
+                : null;
+        return <Item>
+            {poster}
             <Item.Content>
                 <Item.Header as='h1'>{title}</Item.Header>
-                <Item.Meta>{date.getFullYear()}</Item.Meta>
+                <Item.Meta as='h2'>{fullYear}</Item.Meta>
+                {
+                    director
+                        ? <Item.Header as='h3'>{director.name}</Item.Header>
+                        : null
+                }
                 {
                     backdrop_path
-                        ? <Item.Extra><Backdrop imagePath={backdrop_path} rounded={true} size='huge'/></Item.Extra>
-                        : <Loader active={true}/>
+                        ? <Item.Extra>
+                                <Backdrop imagePath={backdrop_path} rounded={true} size='huge'/>
+                            </Item.Extra>
+                        : null
                 }
                 <Item.Description>{overview}</Item.Description>
             </Item.Content>
@@ -31,6 +66,7 @@ export class MovieItem extends Component {
 
 MovieItem.propTypes = {
     backdrop_path: PropTypes.string.isRequired,
+    id: PropTypes.number.isRequired,
     overview: PropTypes.string.isRequired,
     poster_path: PropTypes.string.isRequired,
     release_date: PropTypes.string.isRequired,
