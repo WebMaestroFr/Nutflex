@@ -2,6 +2,8 @@ import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
 
+import {tmdbFetchSearch, tmdbFetchTopRated} from '../actions';
+
 import {Item, Loader} from 'semantic-ui-react';
 
 import {MovieItem} from './Movie';
@@ -34,29 +36,33 @@ export default class MediaList extends Component {
 }
 
 MediaList.propTypes = {
-    ready: PropTypes.bool,
+    ready: PropTypes.bool.isRequired,
     results: PropTypes.array.isRequired
 };
 
-MediaList.defaultProps = {
-    ready: true
-};
-
-function mapFeaturedToProps({tmdbTopRated}) {
-    return {
-        ready: tmdbTopRated.ready,
-        results: tmdbTopRated
-            .results
-            .sort((a, b) => b.popularity - a.popularity)
-            .slice(0, 12)
-    };
+class TopRatedMediaList extends MediaList {
+    componentDidMount() {
+        const {dispatch} = this.props;
+        dispatch(tmdbFetchTopRated());
+    }
 }
 
-function mapSearchToProps({tmdbSearch}) {
-    return {ready: tmdbSearch.ready, results: tmdbSearch.results};
+class SearchResultsMediaList extends MediaList {
+    componentDidMount() {
+        const {dispatch, match} = this.props;
+        dispatch(tmdbFetchSearch(match.params.query.replace(/-/g, ' ')));
+    }
 }
 
-const connectFeatured = connect(mapFeaturedToProps),
-    connectSearch = connect(mapSearchToProps);
-export const Featured = connectFeatured(MediaList),
-    SearchResults = connectSearch(MediaList);
+function mapTopRatedToProps({tmdbTopRated}) {
+    return tmdbTopRated;
+}
+
+function mapSearchResultsToProps({tmdbSearch}) {
+    return tmdbSearch;
+}
+
+const connectTopRated = connect(mapTopRatedToProps),
+    connectSearchResults = connect(mapSearchResultsToProps);
+export const TopRated = connectTopRated(TopRatedMediaList),
+    SearchResults = connectSearchResults(SearchResultsMediaList);

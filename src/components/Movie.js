@@ -11,7 +11,7 @@ export class MovieItem extends Component {
     constructor(props) {
         super(props)
         this.state = {
-            director: null
+            directors: []
         };
     }
     componentDidMount() {
@@ -22,9 +22,9 @@ export class MovieItem extends Component {
             .done(
                 data => data
                     ? this.setState({
-                        director: data
+                        directors: data
                             .crew
-                            .find(credit => credit.job === 'Director')
+                            .filter(credit => credit.job === 'Director')
                     })
                     : null
             );
@@ -35,20 +35,24 @@ export class MovieItem extends Component {
             .cancel();
     }
     render() {
-        const {backdrop_path, overview, poster_path, release_date, title} = this.props, {director} = this.state,
+        const {backdrop_path, overview, poster_path, release_date, title} = this.props, {directors} = this.state,
             date = new Date(release_date),
             fullYear = date.getFullYear(),
             poster = poster_path
                 ? <Poster as={Item.Image} imagePath={poster_path} rounded={true} size='medium'/>
                 : null;
-        return <Item>
+        return <Item as='a'>
             {poster}
             <Item.Content>
                 <Item.Header as='h1'>{title}</Item.Header>
                 <Item.Meta as='h2'>{fullYear}</Item.Meta>
                 {
-                    director
-                        ? <Item.Header as='h3'>{director.name}</Item.Header>
+                    directors.length
+                        ? <Item.Header as='h3'>{
+                                    directors
+                                        .map(d => d.name)
+                                        .join(', ')
+                                }</Item.Header>
                         : null
                 }
                 {

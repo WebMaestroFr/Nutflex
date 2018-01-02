@@ -5,7 +5,7 @@ import {theMovieDB} from '../actions';
 
 import {Divider, Item, List, Loader} from 'semantic-ui-react';
 
-import {Poster} from './Image';
+import {Poster, Still} from './Image';
 
 function pad(n, l = 2) {
     n = String(n);
@@ -16,14 +16,19 @@ function pad(n, l = 2) {
 
 class TvShowSeasonEpisode extends Component {
     render() {
-        const {episode_number, name, season_number} = this.props,
+        const {episode_number, name, season_number, still_path, tvShowName} = this.props,
             episodeNumber = pad(episode_number),
-            seasonNumber = pad(season_number);
-        return <List.Item as='h3'>{
-                season_number !== 0
-                    ? `s${seasonNumber}e${episodeNumber} - ${name}`
-                    : name
-            }</List.Item>;
+            seasonNumber = pad(season_number),
+            image = still_path
+                ? <Still imagePath={still_path} rounded={true} size='medium'/>
+                : null;
+        return <List.Item as='a'>
+            <List.Content as='h3'>{
+                    season_number !== 0
+                        ? `s${seasonNumber}e${episodeNumber} - ${name}`
+                        : name
+                }</List.Content>
+        </List.Item>;
     }
 }
 
@@ -67,7 +72,7 @@ class TvShowSeason extends Component {
             .cancel();
     }
     render() {
-        const {air_date, poster_path, season_number} = this.props, {name, episodes, overview, ready} = this.state,
+        const {air_date, poster_path, season_number, tvShowName} = this.props, {name, episodes, overview, ready} = this.state,
             date = air_date !== null
                 ? new Date(air_date)
                 : null;
@@ -100,7 +105,11 @@ class TvShowSeason extends Component {
                                     ? <Item.Extra>
                                             <Divider inverted={true}/>
                                             <List divided={true} inverted={true} relaxed={true}>
-                                                {episodes.map(episode => <TvShowSeasonEpisode key={`tv-episode-${episode.id}`} {...episode}/>)}
+                                                {
+                                                    episodes.map(
+                                                        episode => <TvShowSeasonEpisode key={`tv-episode-${episode.id}`} tvShowName={tvShowName} {...episode}/>
+                                                    )
+                                                }
                                             </List>
                                         </Item.Extra>
                                     : null
@@ -116,7 +125,8 @@ TvShowSeason.propTypes = {
     air_date: PropTypes.string,
     poster_path: PropTypes.string,
     season_number: PropTypes.number.isRequired,
-    tvShowId: PropTypes.number.isRequired
+    tvShowId: PropTypes.number.isRequired,
+    tvShowName: PropTypes.string.isRequired
 }
 
 export class TvShowItem extends Component {
@@ -182,7 +192,9 @@ export class TvShowItem extends Component {
                                                                 ? 1
                                                                 : a.season_number - b.season_number
                                                         )
-                                                        .map(season => <TvShowSeason key={`tv-season-${season.id}`} tvShowId={id} {...season}/>)
+                                                        .map(
+                                                            season => <TvShowSeason key={`tv-season-${season.id}`} tvShowId={id} tvShowName={name} {...season}/>
+                                                        )
                                                 }
                                             </Item.Group>
                                         </Item.Extra>

@@ -6,16 +6,18 @@
     "homepage": "./",
     "private": true,
     "dependencies": {
+        "history": "^4.7.2",
         "prop-types": "^15.6.0",
         "react": "^16.2.0",
         "react-dom": "^16.2.0",
         "react-redux": "^5.0.6",
-        "react-router-dom": "^4.2.2",
-        "react-scripts": "1.0.17",
+        "react-router": "^4.2.0",
+        "react-router-redux": "^5.0.0-alpha.9",
+        "react-scripts": "^1.0.17",
         "redux": "^3.7.2",
         "redux-thunk": "^2.2.0",
         "semantic-ui-css": "^2.2.12",
-        "semantic-ui-react": "^0.77.0"
+        "semantic-ui-react": "^0.77.1"
     },
     "scripts": {
         "start": "react-scripts start",
@@ -29,7 +31,7 @@
         "dev": "BROWSER=none npm run start & ELECTRON_DEV_URL=http://localhost:3000 electron . "
     },
     "devDependencies": {
-        "electron": "^1.7.9",
+        "electron": "^1.8.1",
         "electron-packager": "^10.1.0"
     }
 }

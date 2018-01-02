@@ -1,9 +1,10 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import {Provider} from 'react-redux';
-import {BrowserRouter} from 'react-router-dom';
-import {applyMiddleware, createStore} from 'redux';
+import {ConnectedRouter, routerReducer, routerMiddleware} from 'react-router-redux';
+import {applyMiddleware, combineReducers, createStore} from 'redux';
 import thunk from 'redux-thunk';
+import createHistory from 'history/createBrowserHistory';
 
 import registerServiceWorker from './registerServiceWorker';
 import reducers from './reducers';
@@ -12,16 +13,19 @@ import App from './components/App';
 
 import 'semantic-ui-css/semantic.min.css';
 
-const store = createStore(reducers, applyMiddleware(thunk));
-
-// localStorage.clear();
+const history = createHistory(),
+    router = routerMiddleware(history),
+    store = createStore(combineReducers({
+        ...reducers,
+        router: routerReducer
+    }), applyMiddleware(router, thunk));
 
 ReactDOM.render(
-    <BrowserRouter>
-        <Provider store={store}>
+    <Provider store={store}>
+        <ConnectedRouter history={history}>
             <App/>
-        </Provider>
-    </BrowserRouter>,
+        </ConnectedRouter>
+    </Provider>,
     document.getElementById(
         'root'
     )

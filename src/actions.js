@@ -1,6 +1,11 @@
 import API from './api';
 import config from './config';
 
+import {replace} from 'react-router-redux';
+export function updateLocation(pathname) {
+    return dispatch => dispatch(replace({pathname}));
+}
+
 export const theMovieDB = new API('https://api.themoviedb.org/3', {
     api_key: config.theMovieDBAPIKey,
     include_adult: false,
@@ -38,28 +43,22 @@ export function tmdbFetchSearch(query) {
 }
 
 export function tmdbFetchTopRated() {
-    const results = {
-        movies: null,
-        tvShows: null
-    };
-    return dispatch => {
-        const dispatchIfReady = () => results.movies && results.tvShows
-            ? dispatch({
-                type: TMDB_TOP_RATED,
-                ...results
-            })
-            : null;
-        theMovieDB
+    const fetchMovies = theMovieDB
             .fetch(`movie/top_rated`)
-            .done(data => {
-                results.movies = data.results;
-                return dispatchIfReady();
-            });
-        theMovieDB
+            .done(data => data.results.map(movie => {
+                movie.media_type = 'movie';
+                return movie;
+            })),
+        fetchTvShows = theMovieDB
             .fetch(`tv/top_rated`)
-            .done(data => {
-                results.tvShows = data.results;
-                return dispatchIfReady();
-            });
-    };
+            .done(data => data.results.map(tvShow => {
+                tvShow.media_type = 'tv';
+                return tvShow;
+            }));
+    return dispatch => Promise
+        .all([fetchMovies, fetchTvShows])
+        .then(results => dispatch({
+            type: TMDB_TOP_RATED,
+            results: [].concat(...results)
+        }));
 }

@@ -4,19 +4,22 @@ const _fetch = ({resolve, reject, timestamp, url}) => fetch(url).then(
         : reject(`[${res.status}] ${url}`)
 );
 
+export function paramsString(args) {
+    return Object
+        .keys(args)
+        .map(k => `${encodeURIComponent(k)}=${encodeURIComponent(args[k])}`)
+        .join('&');
+}
+
 export default class API {
     constructor(base, params = {}, interval = 0) {
 
         this.getUrl = (path, filters) => {
-            const args = {
-                    ...params,
-                    ...filters
-                },
-                paramsString = Object
-                    .keys(args)
-                    .map(k => `${encodeURIComponent(k)}=${encodeURIComponent(args[k])}`)
-                    .join('&');
-            return `${base}/${path}?${paramsString}`;
+            const args = paramsString({
+                ...params,
+                ...filters
+            });
+            return `${base}/${path}?${args}`;
         };
 
         let _ready = true,

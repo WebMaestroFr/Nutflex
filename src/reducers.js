@@ -1,4 +1,3 @@
-import {combineReducers} from 'redux';
 import {TMDB_CONFIGURATION, TMDB_SEARCH_QUERY, TMDB_SEARCH_RESULTS, TMDB_TOP_RATED} from './actions';
 
 const completeMedia = result => {
@@ -9,7 +8,7 @@ const completeMedia = result => {
             result.known_for = result
                 .known_for
                 .filter(completeMedia);
-            return result.name && result.profile_path;
+            return result.name && result.profile_path && result.known_for.length;
         case 'tv':
             return result.id && result.name && result.poster_path;
         default:
@@ -17,7 +16,7 @@ const completeMedia = result => {
     }
 };
 
-function tmdbConfiguration(state = null, action) {
+export function tmdbConfiguration(state = null, action) {
     switch (action.type) {
         case TMDB_CONFIGURATION:
             return action.configuration;
@@ -26,7 +25,7 @@ function tmdbConfiguration(state = null, action) {
     }
 }
 
-function tmdbSearch(state = {
+export function tmdbSearch(state = {
     query: '',
     ready: true,
     results: []
@@ -52,7 +51,7 @@ function tmdbSearch(state = {
     }
 }
 
-function tmdbTopRated(state = {
+export function tmdbTopRated(state = {
     ready: false,
     results: []
 }, action) {
@@ -60,25 +59,15 @@ function tmdbTopRated(state = {
         case TMDB_TOP_RATED:
             return {
                 ready: true,
-                results: [
-                    ...action
-                        .movies
-                        .map(movie => {
-                            movie.media_type = 'movie';
-                            return movie;
-                        }),
-                    ...action
-                        .tvShows
-                        .map(tvShow => {
-                            tvShow.media_type = 'tv';
-                            return tvShow;
-                        })
-                ].filter(completeMedia)
+                results: action
+                    .results
+                    .filter(completeMedia)
+                    .sort((a, b) => b.popularity - a.popularity)
+                    .slice(0, 12)
             };
         default:
             return state;
     }
 }
 
-const tmdbReducers = combineReducers({tmdbConfiguration, tmdbSearch, tmdbTopRated});
-export default tmdbReducers;
+export default {tmdbConfiguration, tmdbSearch, tmdbTopRated};
