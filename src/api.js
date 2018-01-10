@@ -1,9 +1,3 @@
-const _fetch = ({resolve, reject, timestamp, url}) => fetch(url).then(
-    res => res.status === 200
-        ? res.json().then(data => resolve({data, timestamp}), reject)
-        : reject(`[${res.status}] ${url}`)
-);
-
 export function paramsString(args) {
     return Object
         .keys(args)
@@ -11,93 +5,100 @@ export function paramsString(args) {
         .join('&');
 }
 
+// localStorage.clear();
+
+export class APIRequest {
+    constructor(resolve, reject, url) {
+        this.resolve = resolve;
+        this.reject = reject;
+        this.url = url;
+        this.isCanceled = false;
+    }
+    fetch() {
+        return fetch(this.url).then(
+            response => response.status === 200
+                ? response.json().then(this.resolve, this.reject)
+                : this.reject(`[${response.status}] ${this.url}`),
+            this.reject
+        )
+    }
+    cancel() {
+        this.isCanceled = true;
+        this.reject(`[CANCEL] ${this.url}`);
+    }
+}
+
 export default class API {
     constructor(base, params = {}, interval = 0) {
+        this.base = base;
+        this.params = params;
+        this.interval = interval;
+        this.queue = [];
+        this.isProcessing = false;
+    }
 
-        this.getUrl = (path, filters) => {
-            const args = paramsString({
-                ...params,
+    _process() {
+        this.queue = this
+            .queue
+            .filter(r => !r.isCanceled);
+        const request = this
+            .queue
+            .shift();
+        if (request === undefined) {
+            this.isProcessing = false;
+        } else {
+            this.isProcessing = true;
+            request
+                .fetch()
+                .then(() => setTimeout(() => this._process(), this.interval));
+        }
+    }
+
+    _queue(request) {
+        this
+            .queue
+            .push(request);
+        if (!this.isProcessing) {
+            this._process();
+        }
+    };
+
+    fetch(path, filters = {}, expiration = 0) {
+        let request = null;
+        const timestamp = Date.now(),
+            params = paramsString({
+                ...this.params,
                 ...filters
-            });
-            return `${base}/${path}?${args}`;
-        };
-
-        let _ready = true,
-            _queue = [];
-        const _process = () => {
-            const item = _queue.shift();
-            if (item === undefined) {
-                _ready = true;
-            } else {
-                _ready = false;
-                console.info(`[FETCH] ${item.url}`);
-                _fetch(item).catch(reason => {
-                    if (item.retries) {
-                        console.error(`[RETRY]`, reason);
-                        item.retries -= 1;
-                        _queue.unshift(item);
-                    } else {
-                        item.reject(reason);
-                    }
-                });
-                setTimeout(_process, interval);
-            }
-        };
-
-        this.queue = (url, timestamp, clear, retries, resolve, reject) => {
-            if (clear) {
-                _queue.map(item => item.reject(`[CLEAR] ${item.url}`));
-                _queue = [];
-            }
-            _queue.push({resolve, reject, timestamp, url, retries});
-            if (_ready) {
-                _process();
-            }
-        };
-
-    }
-
-    getCache(url) {
-        // localStorage.removeItem(url);
-        const content = localStorage.getItem(url);
-        return content
-            ? JSON.parse(content)
-            : {
-                data: null,
-                timestamp: 0
-            };
-    }
-
-    setCache(url, content) {
-        localStorage.setItem(url, JSON.stringify(content));
-    }
-
-    fetch(path, filters = {}, expiration = 60 * 60, clear = false, retries = 1) {
-        let cancel = false;
-        const url = this.getUrl(path, filters),
-            cache = this.getCache(url),
-            timestamp = Date.now(),
-            promise = new Promise(
-                (resolve, reject) => cache.data && timestamp - cache.timestamp < expiration * 1000
-                    ? resolve(cache)
-                    : this.queue(url, timestamp, clear, retries, resolve, reject)
-            ),
-            resolution = promise
-                .then(content => {
-                    this.setCache(url, content);
-                    return content.data;
+            }),
+            url = `${this.base}/${path}?${params}`,
+            item = localStorage.getItem(url),
+            cache = item
+                ? JSON.parse(item)
+                : null;
+        const promise = (cache && timestamp - cache.timestamp < expiration * 1000)
+            ? Promise
+                .resolve(cache.data)
+                .then(data => {
+                    // console.log(`[CACHE] ${url}`);
+                    return data;
                 })
-                .catch(reason => {
-                    console.warn(reason);
-                    return cache.data;
-                });
+            : new Promise((resolve, reject) => {
+                request = new APIRequest(data => {
+                    if (expiration) {
+                        const content = JSON.stringify({data, timestamp})
+                        localStorage.setItem(url, content);
+                    }
+                    // console.log(`[FETCH] ${url}`);
+                    return resolve(data);
+                }, reject, url);
+                this._queue(request);
+            });
         return {
-            cancel: () => cancel = true,
-            done: callback => resolution.then(
-                content => cancel || !content
-                    ? null
-                    : callback(content)
-            )
+            cancel: () => request
+                ? request.cancel()
+                : null,
+            // done: (callback) => promise.then(callback, console.warn)
+            done: (callback) => promise.then(callback, () => null)
         };
     }
 }

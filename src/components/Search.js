@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
 
-import {updateLocation, tmdbFetchSearch} from '../actions';
+import {tmdbFetchSearch} from '../actions';
 
 import {Container, Input} from 'semantic-ui-react';
 
@@ -28,7 +28,7 @@ Search.propTypes = {
     onChange: PropTypes.func.isRequired
 };
 
-const mapStateToProps = ({tmdbSearch}) => {
+const mapStateToProps = ({router, tmdbSearch}) => {
     return {
         loading: !tmdbSearch.ready
     };
@@ -36,19 +36,7 @@ const mapStateToProps = ({tmdbSearch}) => {
 
 const mapDispatchToProps = dispatch => {
     return {
-        onChange: query => {
-            const param = query
-                .replace(/\s+/g, '-')
-                .toLowerCase()
-                .normalize('NFD')
-                .replace(/[\u0300-\u036f]/g, '');
-            dispatch(tmdbFetchSearch(query));
-            dispatch(updateLocation(
-                query
-                    ? `/search/${param}`
-                    : '/'
-            ));
-        }
+        onChange: query => dispatch(tmdbFetchSearch(query))
     };
 };
 

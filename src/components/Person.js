@@ -17,7 +17,7 @@ export class PersonItem extends Component {
                     known_for.length
                         ? <Item.Extra>
                                 <Divider inverted={true}/>
-                                <MediaList results={known_for}/>
+                                <MediaList results={known_for} ready={true}/>
                             </Item.Extra>
                         : null
                 }

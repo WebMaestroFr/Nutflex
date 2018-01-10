@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
-import {Switch, Route} from 'react-router';
+import {Route, Switch} from 'react-router';
 import PropTypes from 'prop-types';
 
 import {tmdbFetchConfiguration} from '../actions';
@@ -11,6 +11,8 @@ import {TopRated, SearchResults} from './MediaList';
 import Search from './Search';
 
 import './App.css';
+
+const ConnectedSwitch = connect(({router}) => ({location: router.location}))(Switch);
 
 class App extends Component {
     componentDidMount() {
@@ -25,10 +27,10 @@ class App extends Component {
                         <Search/>
                     </Segment>
                     <Segment className='App-main' inverted={true} padded='very'>
-                        <Switch>
+                        <ConnectedSwitch>
                             <Route exact={true} path='/' component={TopRated}/>
                             <Route path='/search/:query' component={SearchResults}/>
-                        </Switch>
+                        </ConnectedSwitch>
                     </Segment>
                 </Container>
             : <Loader active={true}/>;

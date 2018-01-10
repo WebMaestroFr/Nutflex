@@ -3,7 +3,7 @@ import config from './config';
 
 import {replace} from 'react-router-redux';
 export function updateLocation(pathname) {
-    return dispatch => dispatch(replace({pathname}));
+    return dispatch => dispatch(replace(pathname));
 }
 
 export const theMovieDB = new API('https://api.themoviedb.org/3', {
@@ -19,38 +19,53 @@ export const TMDB_TOP_RATED = 'TMDB_TOP_RATED';
 
 export function tmdbFetchConfiguration() {
     return dispatch => theMovieDB
-        .fetch('configuration')
+        .fetch('configuration', {}, 24 * 60 * 60)
         .done(configuration => dispatch({type: TMDB_CONFIGURATION, configuration}));
 }
 
-export function tmdbFetchSearch(query) {
+let searchRequest = null;
+export function tmdbFetchSearch(search) {
+    if (searchRequest) {
+        searchRequest.cancel();
+    }
     return dispatch => {
-        dispatch({type: TMDB_SEARCH_QUERY, query});
-        return query
-            ? theMovieDB
-                .fetch(`search/multi`, {
-                    query
-                }, 4 * 60 * 60, true)
-                .done(data => dispatch({
-                    type: TMDB_SEARCH_RESULTS,
-                    query,
-                    results: data
-                        ? data.results
-                        : []
-                }))
-            : null;
+        if (search === '') {
+            searchRequest = null;
+            dispatch(updateLocation('/'));
+            dispatch({type: TMDB_SEARCH_QUERY, query: null});
+        } else {
+            const param = search
+                    .trim()
+                    .replace(/\s+/g, '-')
+                    .toLowerCase()
+                    .normalize('NFD')
+                    .replace(/[\u0300-\u036f]/g, ''),
+                query = param.replace(/-/g, ' ');
+            searchRequest = theMovieDB.fetch(`search/multi`, {
+                query
+            }, 24 * 60 * 60);
+            searchRequest.done(data => dispatch({
+                type: TMDB_SEARCH_RESULTS,
+                query,
+                results: data
+                    ? data.results
+                    : []
+            }));
+            dispatch(updateLocation(`/search/${param}`));
+            dispatch({type: TMDB_SEARCH_QUERY, query});
+        }
     };
 }
 
 export function tmdbFetchTopRated() {
     const fetchMovies = theMovieDB
-            .fetch(`movie/top_rated`)
+            .fetch(`movie/top_rated`, {}, 12 * 60 * 60)
             .done(data => data.results.map(movie => {
                 movie.media_type = 'movie';
                 return movie;
             })),
         fetchTvShows = theMovieDB
-            .fetch(`tv/top_rated`)
+            .fetch(`tv/top_rated`, {}, 12 * 60 * 60)
             .done(data => data.results.map(tvShow => {
                 tvShow.media_type = 'tv';
                 return tvShow;
