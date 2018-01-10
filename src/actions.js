@@ -19,7 +19,7 @@ export const TMDB_TOP_RATED = 'TMDB_TOP_RATED';
 
 export function tmdbFetchConfiguration() {
     return dispatch => theMovieDB
-        .fetch('configuration', {}, 24 * 60 * 60)
+        .get('configuration', {}, 24 * 60 * 60)
         .done(configuration => dispatch({type: TMDB_CONFIGURATION, configuration}));
 }
 
@@ -41,7 +41,7 @@ export function tmdbFetchSearch(search) {
                     .normalize('NFD')
                     .replace(/[\u0300-\u036f]/g, ''),
                 query = param.replace(/-/g, ' ');
-            searchRequest = theMovieDB.fetch(`search/multi`, {
+            searchRequest = theMovieDB.get(`search/multi`, {
                 query
             }, 24 * 60 * 60);
             searchRequest.done(data => dispatch({
@@ -59,13 +59,13 @@ export function tmdbFetchSearch(search) {
 
 export function tmdbFetchTopRated() {
     const fetchMovies = theMovieDB
-            .fetch(`movie/top_rated`, {}, 12 * 60 * 60)
+            .get(`movie/top_rated`, {}, 12 * 60 * 60)
             .done(data => data.results.map(movie => {
                 movie.media_type = 'movie';
                 return movie;
             })),
         fetchTvShows = theMovieDB
-            .fetch(`tv/top_rated`, {}, 12 * 60 * 60)
+            .get(`tv/top_rated`, {}, 12 * 60 * 60)
             .done(data => data.results.map(tvShow => {
                 tvShow.media_type = 'tv';
                 return tvShow;

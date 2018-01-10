@@ -16,7 +16,7 @@ export class MovieItem extends Component {
     }
     componentDidMount() {
         const {id} = this.props;
-        this._fetch = theMovieDB.fetch(`movie/${id}/credits`);
+        this._fetch = theMovieDB.get(`movie/${id}/credits`);
         this
             ._fetch
             .done(

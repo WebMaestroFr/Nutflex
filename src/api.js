@@ -8,14 +8,15 @@ export function paramsString(args) {
 // localStorage.clear();
 
 export class APIRequest {
-    constructor(resolve, reject, url) {
+    constructor(resolve, reject, url, init) {
         this.resolve = resolve;
         this.reject = reject;
         this.url = url;
+        this.init = init;
         this.isCanceled = false;
     }
     fetch() {
-        return fetch(this.url).then(
+        return fetch(this.url, this.init).then(
             response => response.status === 200
                 ? response.json().then(this.resolve, this.reject)
                 : this.reject(`[${response.status}] ${this.url}`),
@@ -61,9 +62,9 @@ export default class API {
         if (!this.isProcessing) {
             this._process();
         }
-    };
+    }
 
-    fetch(path, filters = {}, expiration = 0) {
+    fetch(path, filters = {}, expiration = 0, init = {}) {
         let request = null;
         const timestamp = Date.now(),
             params = paramsString({
@@ -90,7 +91,7 @@ export default class API {
                     }
                     // console.log(`[FETCH] ${url}`);
                     return resolve(data);
-                }, reject, url);
+                }, reject, url, init);
                 this._queue(request);
             });
         return {
@@ -100,5 +101,19 @@ export default class API {
             // done: (callback) => promise.then(callback, console.warn)
             done: (callback) => promise.then(callback, () => null)
         };
+    }
+
+    get(path, filters = {}, expiration = 0, init = {}) {
+        return this.fetch(path, filters, expiration, {
+            ...init,
+            method: 'GET'
+        });
+    }
+
+    post(path, filters = {}, expiration = 0, init = {}) {
+        return this.fetch(path, filters, expiration, {
+            ...init,
+            method: 'POST'
+        });
     }
 }

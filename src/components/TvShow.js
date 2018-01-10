@@ -47,7 +47,7 @@ class TvShowSeason extends Component {
     }
     componentDidMount() {
         const {tvShowId, season_number} = this.props;
-        this._fetch = theMovieDB.fetch(`tv/${tvShowId}/season/${season_number}`);
+        this._fetch = theMovieDB.get(`tv/${tvShowId}/season/${season_number}`);
         this
             ._fetch
             .done(data => this.setState(
@@ -133,7 +133,7 @@ export class TvShowItem extends Component {
     }
     componentDidMount() {
         const {id} = this.props;
-        this._fetch = theMovieDB.fetch(`tv/${id}`);
+        this._fetch = theMovieDB.get(`tv/${id}`);
         this
             ._fetch
             .done(data => this.setState(
